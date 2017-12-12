@@ -2,6 +2,7 @@ from builtins import object
 from crypt import crypt
 from string import ascii_letters, digits
 from random import choice
+import bcrypt
 import subprocess
 try:
     from collections import OrderedDict
@@ -90,6 +91,10 @@ class Basic(object):
             return self._md5_password(password)
         elif self.encryption_mode.lower() == 'md5-base':
             return self._md5_base_password(password)
+        elif self.encryption_mode.lower() == 'bcrypt':
+            return self._bcrypt_password(password)
+        elif self.encryption_mode.lower() == 'hash':
+            return self._hash(password)
         else:
             raise UnknownEncryptionMode(self.encryption_mode)
 
@@ -117,3 +122,11 @@ class Basic(object):
                                         'passwd',
                                         '-1',
                                         password]).decode('utf-8').strip()
+
+    def _bcrypt_password(self, password):
+        """ bcrypt password using bcrypt library"""
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    def _hash(self, hash):
+        """ adds the provided hash to the file """
+        return hash
